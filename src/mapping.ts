@@ -72,7 +72,7 @@ export function handleDodoBirth(event: DODOBirth): void {
       return
     }
 
-    token0.decimals = decimals
+    token1.decimals = decimals
     //token0.derivedETH = ZERO_BD
     //token0.tradeVolume = ZERO_BD
     //token0.tradeVolumeUSD = ZERO_BD
@@ -107,6 +107,6 @@ export function handleDodoBirth(event: DODOBirth): void {
   // save updated values
   token0.save()
   token1.save()
-  pair.save()
+  dodoPair.save()
   factory.save()
 }
