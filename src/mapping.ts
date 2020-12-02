@@ -34,15 +34,15 @@ export function handleDodoBirth(event: DODOBirth): void {
   factory.save()
 
   // create the tokens
-  let token0 = Token.load(event.params.baseToken.toHexString())
-  let token1 = Token.load(event.params.quoteToken.toHexString())
+  let baseToken = Token.load(event.params.baseToken.toHexString())
+  let quoteToken = Token.load(event.params.quoteToken.toHexString())
 
   // fetch info if null
-  if (token0 === null) {
-    token0 = new Token(event.params.baseToken.toHexString())
-    token0.symbol = fetchTokenSymbol(event.params.baseToken)
-    token0.name = fetchTokenName(event.params.baseToken)
-    //token0.totalSupply = fetchTokenTotalSupply(event.params.token0)
+  if (baseToken === null) {
+    baseToken = new Token(event.params.baseToken.toHexString())
+    baseToken.symbol = fetchTokenSymbol(event.params.baseToken)
+    baseToken.name = fetchTokenName(event.params.baseToken)
+    //baseToken.totalSupply = fetchTokenTotalSupply(event.params.baseToken)
     let decimals = fetchTokenDecimals(event.params.baseToken)
     // bail if we couldn't figure out the decimals
     if (decimals === null) {
@@ -50,21 +50,21 @@ export function handleDodoBirth(event: DODOBirth): void {
       return
     }
 
-    token0.decimals = decimals
-    //token0.derivedETH = ZERO_BD
-    //token0.tradeVolume = ZERO_BD
-    //token0.tradeVolumeUSD = ZERO_BD
-    //token0.untrackedVolumeUSD = ZERO_BD
-    //token0.totalLiquidity = ZERO_BD
-    // token0.allPairs = []
-    //token0.txCount = ZERO_BI
+    baseToken.decimals = decimals
+    //baseToken.derivedETH = ZERO_BD
+    //baseToken.tradeVolume = ZERO_BD
+    //baseToken.tradeVolumeUSD = ZERO_BD
+    //baseToken.untrackedVolumeUSD = ZERO_BD
+    //baseToken.totalLiquidity = ZERO_BD
+    // baseToken.allPairs = []
+    //baseToken.txCount = ZERO_BI
   }
 
-  if (token1 === null) {
-    token1 = new Token(event.params.quoteToken.toHexString())
-    token1.symbol = fetchTokenSymbol(event.params.quoteToken)
-    token1.name = fetchTokenName(event.params.quoteToken)
-    //token0.totalSupply = fetchTokenTotalSupply(event.params.token0)
+  if (quoteToken === null) {
+    quoteToken = new Token(event.params.quoteToken.toHexString())
+    quoteToken.symbol = fetchTokenSymbol(event.params.quoteToken)
+    quoteToken.name = fetchTokenName(event.params.quoteToken)
+    //baseToken.totalSupply = fetchTokenTotalSupply(event.params.baseToken)
     let decimals = fetchTokenDecimals(event.params.quoteToken)
     // bail if we couldn't figure out the decimals
     if (decimals === null) {
@@ -72,18 +72,18 @@ export function handleDodoBirth(event: DODOBirth): void {
       return
     }
 
-    token1.decimals = decimals
-    //token0.derivedETH = ZERO_BD
-    //token0.tradeVolume = ZERO_BD
-    //token0.tradeVolumeUSD = ZERO_BD
-    //token0.untrackedVolumeUSD = ZERO_BD
-    //token0.totalLiquidity = ZERO_BD
-    // token0.allPairs = []
-    //token0.txCount = ZERO_BI
+    quoteToken.decimals = decimals
+    //baseToken.derivedETH = ZERO_BD
+    //baseToken.tradeVolume = ZERO_BD
+    //baseToken.tradeVolumeUSD = ZERO_BD
+    //baseToken.untrackedVolumeUSD = ZERO_BD
+    //baseToken.totalLiquidity = ZERO_BD
+    // baseToken.allPairs = []
+    //baseToken.txCount = ZERO_BI
   }
   let dodoPair = new DODOPair(event.params.newBorn.toHexString()) as DODOPair
-  dodoPair.token0 = token0.id
-  dodoPair.token1 = token1.id
+  dodoPair.baseToken = baseToken.id
+  dodoPair.quoteToken = quoteToken.id
   //pair.liquidityProviderCount = ZERO_BI
   //pair.createdAtTimestamp = event.block.timestamp
   //pair.createdAtBlockNumber = event.block.number
@@ -105,8 +105,8 @@ export function handleDodoBirth(event: DODOBirth): void {
   //PairTemplate.create(event.params.pair)
 
   // save updated values
-  token0.save()
-  token1.save()
+  baseToken.save()
+  quoteToken.save()
   dodoPair.save()
   factory.save()
 }

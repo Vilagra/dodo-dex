@@ -140,21 +140,21 @@ export class DODOPair extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get token0(): string {
-    let value = this.get("token0");
+  get baseToken(): string {
+    let value = this.get("baseToken");
     return value.toString();
   }
 
-  set token0(value: string) {
-    this.set("token0", Value.fromString(value));
+  set baseToken(value: string) {
+    this.set("baseToken", Value.fromString(value));
   }
 
-  get token1(): string {
-    let value = this.get("token1");
+  get quoteToken(): string {
+    let value = this.get("quoteToken");
     return value.toString();
   }
 
-  set token1(value: string) {
-    this.set("token1", Value.fromString(value));
+  set quoteToken(value: string) {
+    this.set("quoteToken", Value.fromString(value));
   }
 }
