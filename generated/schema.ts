@@ -158,3 +158,87 @@ export class DODOPair extends Entity {
     this.set("quoteToken", Value.fromString(value));
   }
 }
+
+export class Trade extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save Trade entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save Trade entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("Trade", id.toString(), this);
+  }
+
+  static load(id: string): Trade | null {
+    return store.get("Trade", id) as Trade | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get dodoPair(): string | null {
+    let value = this.get("dodoPair");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set dodoPair(value: string | null) {
+    if (value === null) {
+      this.unset("dodoPair");
+    } else {
+      this.set("dodoPair", Value.fromString(value as string));
+    }
+  }
+
+  get baseBuy(): BigDecimal {
+    let value = this.get("baseBuy");
+    return value.toBigDecimal();
+  }
+
+  set baseBuy(value: BigDecimal) {
+    this.set("baseBuy", Value.fromBigDecimal(value));
+  }
+
+  get baseSell(): BigDecimal {
+    let value = this.get("baseSell");
+    return value.toBigDecimal();
+  }
+
+  set baseSell(value: BigDecimal) {
+    this.set("baseSell", Value.fromBigDecimal(value));
+  }
+
+  get quoteBuy(): BigDecimal {
+    let value = this.get("quoteBuy");
+    return value.toBigDecimal();
+  }
+
+  set quoteBuy(value: BigDecimal) {
+    this.set("quoteBuy", Value.fromBigDecimal(value));
+  }
+
+  get quoteSell(): BigDecimal {
+    let value = this.get("quoteSell");
+    return value.toBigDecimal();
+  }
+
+  set quoteSell(value: BigDecimal) {
+    this.set("quoteSell", Value.fromBigDecimal(value));
+  }
+}

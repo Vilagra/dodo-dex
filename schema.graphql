@@ -20,4 +20,14 @@ type DODOPair @entity {
     baseToken: Token!
     quoteToken: Token!
 }
+
+type Trade @entity {
+    id: ID!
+
+    dodoPair: DODOPair
+    baseBuy: BigDecimal!
+    baseSell: BigDecimal!
+    quoteBuy: BigDecimal!
+    quoteSell: BigDecimal!
+}
    
