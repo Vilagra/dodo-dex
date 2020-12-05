@@ -30,4 +30,26 @@ type Trade @entity {
     quoteBuy: BigDecimal!
     quoteSell: BigDecimal!
 }
+
+type Deposit @entity {
+    id: ID!
+
+    dodoPair: DODOPair
+    deposited: Token
+    payer: Bytes
+    receiver: Bytes
+    amount: BigDecimal!
+    lpTokenAmount: BigDecimal!
+}
+
+type Withdraw @entity {
+    id: ID!
+
+    dodoPair: DODOPair
+    deposited: Token
+    payer: Bytes
+    receiver: Bytes
+    amount: BigDecimal!
+    lpTokenAmount: BigDecimal!
+}
    
