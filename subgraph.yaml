@@ -55,4 +55,10 @@ templates:
           handler: handleBaseSell
         - event: BuyBaseToken(indexed address,uint256,uint256)
           handler: handleBaseBuy
+        - event: Deposit(indexed address,indexed address,bool,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,bool,uint256,uint256)
+          handler: handleWithdraw
+
+
 
