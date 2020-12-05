@@ -1,8 +1,9 @@
 import { DODOBirth } from '../generated/ZooFactory/Zoo'
 import { ZooFactory, Token, DODOPair } from '../generated/schema'
 import { log } from '@graphprotocol/graph-ts'
+import {DODOPairTemplate} from "../generated/templates";
 import {
-  ZERO_BD,
+  ZERO_BIG_DECIMAL,
   ZERO_BI,
   fetchTokenSymbol,
   fetchTokenName,
@@ -105,6 +106,8 @@ export function handleDodoBirth(event: DODOBirth): void {
   //PairTemplate.create(event.params.pair)
 
   // save updated values
+  DODOPairTemplate.create(event.params.newBorn)
+
   baseToken.save()
   quoteToken.save()
   dodoPair.save()

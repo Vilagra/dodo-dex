@@ -31,3 +31,27 @@ dataSources:
         - event: DODOBirth(address,address,address)
           handler: handleDodoBirth
       file: ZooFactory\ZooFactory.wasm
+templates:
+  - kind: ethereum/contract
+    name: DODOPairTemplate
+    network: mainnet
+    source:
+      abi: DODOPair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      file: templates\DODOPairTemplate\DODOPairTemplate.wasm
+      entities:
+        - DODOPair
+        - Token
+      abis:
+        - name: DODOPair
+          file: DODOPairTemplate\abis\DODOPair.json
+        - name: ZooFactory
+          file: DODOPairTemplate\abis\Zoo.json
+      eventHandlers:
+        - event: SellBaseToken(indexed address,uint256,uint256)
+          handler: handleBaseSell
+        - event: BuyBaseToken(indexed address,uint256,uint256)
+          handler: handleBaseBuy
