@@ -1,9 +1,14 @@
-import { SellBaseToken, BuyBaseToken, Deposit as DepositEvent, Withdraw as WithdrawEvent} from "../generated/templates/DODOPairTemplate/DODOPair";
+import {
+    SellBaseToken,
+    BuyBaseToken,
+    Deposit as DepositEvent,
+    Withdraw as WithdrawEvent
+} from "../generated/templates/DODOPairTemplate/DODOPair";
 import {DODOPair, Token, Trade, Deposit, Withdraw} from "../generated/schema";
 import {convertTokenToDecimal, ZERO_BIG_DECIMAL} from "./helpers";
 import {BigDecimal} from "@graphprotocol/graph-ts/index";
 
-export function handleBaseSell(event: SellBaseToken) : void{
+export function handleBaseSell(event: SellBaseToken): void {
     let dodoPair = DODOPair.load(event.address.toHexString())
     let baseToken = Token.load(dodoPair.baseToken)
     let quoteToken = Token.load(dodoPair.quoteToken)
@@ -19,7 +24,7 @@ export function handleBaseSell(event: SellBaseToken) : void{
 
 }
 
-export function handleBaseBuy(event: BuyBaseToken) : void{
+export function handleBaseBuy(event: BuyBaseToken): void {
     let dodoPair = DODOPair.load(event.address.toHexString())
     let baseToken = Token.load(dodoPair.baseToken)
     let quoteToken = Token.load(dodoPair.quoteToken)
@@ -34,34 +39,34 @@ export function handleBaseBuy(event: BuyBaseToken) : void{
     trade.save()
 }
 
-export function handleDeposit(event: DepositEvent){
+export function handleDeposit(event: DepositEvent): void {
     let dodoPair = DODOPair.load(event.address.toHexString())
-    let depositedToken
-    if(event.params.isBaseToken) {
-        depositedToken = Token.load(dodoPair.baseToken)
+    let depositedToken: Token
+    if (event.params.isBaseToken) {
+        depositedToken = Token.load(dodoPair.baseToken) as Token
     } else {
-        depositedToken = Token.load(dodoPair.quoteToken)
+        depositedToken = Token.load(dodoPair.quoteToken) as Token
     }
     let deposit = new Deposit(event.transaction.hash.toHexString())
     deposit.dodoPair = dodoPair.id
-    deposit.deposited = depositedToken
+    deposit.deposited = depositedToken.id
     deposit.payer = event.params.payer
     deposit.receiver = event.params.receiver
     deposit.amount = convertTokenToDecimal(event.params.amount, depositedToken.decimals)
     deposit.lpTokenAmount = convertTokenToDecimal(event.params.lpTokenAmount, depositedToken.decimals)
 }
 
-export function handleWithdraw(event: WithdrawEvent){
+export function handleWithdraw(event: WithdrawEvent): void {
     let dodoPair = DODOPair.load(event.address.toHexString())
-    let withdrawedToken
-    if(event.params.isBaseToken) {
-        withdrawedToken = Token.load(dodoPair.baseToken)
+    let withdrawedToken: Token
+    if (event.params.isBaseToken) {
+        withdrawedToken = Token.load(dodoPair.baseToken) as Token
     } else {
-        withdrawedToken = Token.load(dodoPair.quoteToken)
+        withdrawedToken = Token.load(dodoPair.quoteToken) as Token
     }
     let withdraw = new Withdraw(event.transaction.hash.toHexString())
     withdraw.dodoPair = dodoPair.id
-    withdraw.deposited = withdrawedToken
+    withdraw.deposited = withdrawedToken.id
     withdraw.payer = event.params.payer
     withdraw.receiver = event.params.receiver
     withdraw.amount = convertTokenToDecimal(event.params.amount, withdrawedToken.decimals)
