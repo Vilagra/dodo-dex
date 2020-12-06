@@ -30,7 +30,7 @@ dataSources:
       eventHandlers:
         - event: DODOBirth(address,address,address)
           handler: handleDodoBirth
-      file: ./src/mapping.ts
+      file: ./src/factory.ts
 templates:
   - kind: ethereum/contract
     name: DODOPairTemplate
@@ -59,6 +59,7 @@ templates:
           handler: handleDeposit
         - event: Withdraw(indexed address,indexed address,bool,uint256,uint256)
           handler: handleWithdraw
+
 
 
 

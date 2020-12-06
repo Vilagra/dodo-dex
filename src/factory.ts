@@ -8,7 +8,7 @@ import {
   fetchTokenSymbol,
   fetchTokenName,
   fetchTokenDecimals,
-  fetchTokenTotalSupply
+  fetchTokenTotalSupply, createTokenFromAddress
 } from './helpers'
 
 export const FACTORY_ADDRESS = '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'
@@ -33,25 +33,13 @@ export function handleDodoBirth(event: DODOBirth): void {
   }
   factory.pairCount = factory.pairCount + 1
   factory.save()
-
   // create the tokens
   let baseToken = Token.load(event.params.baseToken.toHexString())
   let quoteToken = Token.load(event.params.quoteToken.toHexString())
 
   // fetch info if null
   if (baseToken === null) {
-    baseToken = new Token(event.params.baseToken.toHexString())
-    baseToken.symbol = fetchTokenSymbol(event.params.baseToken)
-    baseToken.name = fetchTokenName(event.params.baseToken)
-    //baseToken.totalSupply = fetchTokenTotalSupply(event.params.baseToken)
-    let decimals = fetchTokenDecimals(event.params.baseToken)
-    // bail if we couldn't figure out the decimals
-    if (decimals === null) {
-      log.debug('mybug the decimal on token 0 was null', [])
-      return
-    }
-
-    baseToken.decimals = decimals
+    baseToken = createTokenFromAddress(event.params.baseToken)
     //baseToken.derivedETH = ZERO_BD
     //baseToken.tradeVolume = ZERO_BD
     //baseToken.tradeVolumeUSD = ZERO_BD
@@ -62,18 +50,9 @@ export function handleDodoBirth(event: DODOBirth): void {
   }
 
   if (quoteToken === null) {
-    quoteToken = new Token(event.params.quoteToken.toHexString())
-    quoteToken.symbol = fetchTokenSymbol(event.params.quoteToken)
-    quoteToken.name = fetchTokenName(event.params.quoteToken)
+    quoteToken = createTokenFromAddress(event.params.quoteToken)
     //baseToken.totalSupply = fetchTokenTotalSupply(event.params.baseToken)
-    let decimals = fetchTokenDecimals(event.params.quoteToken)
     // bail if we couldn't figure out the decimals
-    if (decimals === null) {
-      log.debug('mybug the decimal on token 0 was null', [])
-      return
-    }
-
-    quoteToken.decimals = decimals
     //baseToken.derivedETH = ZERO_BD
     //baseToken.tradeVolume = ZERO_BD
     //baseToken.tradeVolumeUSD = ZERO_BD
