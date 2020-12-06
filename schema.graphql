@@ -46,7 +46,7 @@ type Withdraw @entity {
     id: ID!
 
     dodoPair: DODOPair
-    deposited: Token
+    withdrawed: Token
     payer: Bytes
     receiver: Bytes
     amount: BigDecimal!

@@ -54,6 +54,7 @@ export function handleDeposit(event: DepositEvent): void {
     deposit.receiver = event.params.receiver
     deposit.amount = convertTokenToDecimal(event.params.amount, depositedToken.decimals)
     deposit.lpTokenAmount = convertTokenToDecimal(event.params.lpTokenAmount, depositedToken.decimals)
+    deposit.save()
 }
 
 export function handleWithdraw(event: WithdrawEvent): void {
@@ -66,9 +67,10 @@ export function handleWithdraw(event: WithdrawEvent): void {
     }
     let withdraw = new Withdraw(event.transaction.hash.toHexString())
     withdraw.dodoPair = dodoPair.id
-    withdraw.deposited = withdrawedToken.id
+    withdraw.withdrawed = withdrawedToken.id
     withdraw.payer = event.params.payer
     withdraw.receiver = event.params.receiver
     withdraw.amount = convertTokenToDecimal(event.params.amount, withdrawedToken.decimals)
     withdraw.lpTokenAmount = convertTokenToDecimal(event.params.lpTokenAmount, withdrawedToken.decimals)
+    withdraw.save()
 }
