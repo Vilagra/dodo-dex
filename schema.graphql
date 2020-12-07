@@ -1,6 +1,14 @@
-type ZooFactory @entity {
+type MainStatistic @entity {
     id: ID!
     pairCount: Int!
+    # trade stats
+    tradeCount: Int!
+    # deposit stats
+    depositCount: Int!
+    # deposit stats
+    witdrawCount: Int!
+    amountAwailableTokens: Int!
+
 }
 
 type Token @entity {
@@ -52,4 +60,5 @@ type Withdraw @entity {
     amount: BigDecimal!
     lpTokenAmount: BigDecimal!
 }
+
    

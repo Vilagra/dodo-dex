@@ -30,7 +30,7 @@ dataSources:
       eventHandlers:
         - event: DODOBirth(address,address,address)
           handler: handleDodoBirth
-      file: ./src/factory.ts
+      file: ./src/main.ts
 templates:
   - kind: ethereum/contract
     name: DODOPairTemplate

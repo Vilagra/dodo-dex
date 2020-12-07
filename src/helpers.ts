@@ -3,13 +3,14 @@ import {log, BigInt, BigDecimal, Address} from '@graphprotocol/graph-ts'
 import {ERC20} from '../generated/ZooFactory/ERC20'
 import {ERC20SymbolBytes} from '../generated/ZooFactory/ERC20SymbolBytes'
 import {ERC20NameBytes} from '../generated/ZooFactory/ERC20NameBytes'
-import {FACTORY_ADDRESS} from "./factory";
+import {FACTORY_ADDRESS} from "./main";
 import {Token} from "../generated/schema";
+import {ZooFactory} from "../generated/templates/DODOPairTemplate/ZooFactory";
 // import { User, Bundle, Token, LiquidityPosition, LiquidityPositionSnapshot, Pair } from '../types/schema'
 // import { Factory as FactoryContract } from '../types/templates/Pair/Factory'
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
-//export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
+export let factoryContract = ZooFactory.bind(Address.fromString(FACTORY_ADDRESS))
 
 export let ZERO_BI = BigInt.fromI32(0)
 export let ONE_BI = BigInt.fromI32(1)

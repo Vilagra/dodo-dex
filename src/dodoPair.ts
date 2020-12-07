@@ -4,8 +4,9 @@ import {
     Deposit as DepositEvent,
     Withdraw as WithdrawEvent
 } from "../generated/templates/DODOPairTemplate/DODOPair";
-import {DODOPair, Token, Trade, Deposit, Withdraw} from "../generated/schema";
+import {DODOPair, Token, Trade, Deposit, Withdraw, MainStatistic} from "../generated/schema";
 import {convertTokenToDecimal, ZERO_BIG_DECIMAL} from "./helpers";
+import {FACTORY_ADDRESS} from "./main";
 import {BigDecimal} from "@graphprotocol/graph-ts/index";
 
 export function handleBaseSell(event: SellBaseToken): void {
@@ -22,7 +23,13 @@ export function handleBaseSell(event: SellBaseToken): void {
     trade.quoteBuy = quoteBuyAmount
     trade.save()
 
+    //update statistic
+    let mainStatistic = MainStatistic.load(FACTORY_ADDRESS)
+    mainStatistic.tradeCount = mainStatistic.tradeCount + 1
+    mainStatistic.save()
+
 }
+
 
 export function handleBaseBuy(event: BuyBaseToken): void {
     let dodoPair = DODOPair.load(event.address.toHexString())
@@ -37,6 +44,11 @@ export function handleBaseBuy(event: BuyBaseToken): void {
     trade.quoteSell = quoteSellAmount
     trade.quoteBuy = ZERO_BIG_DECIMAL
     trade.save()
+
+    //update statistic
+    let mainStatistic = MainStatistic.load(FACTORY_ADDRESS)
+    mainStatistic.tradeCount = mainStatistic.tradeCount + 1
+    mainStatistic.save()
 }
 
 export function handleDeposit(event: DepositEvent): void {
@@ -55,6 +67,11 @@ export function handleDeposit(event: DepositEvent): void {
     deposit.amount = convertTokenToDecimal(event.params.amount, depositedToken.decimals)
     deposit.lpTokenAmount = convertTokenToDecimal(event.params.lpTokenAmount, depositedToken.decimals)
     deposit.save()
+
+    //update statistic
+    let mainStatistic = MainStatistic.load(FACTORY_ADDRESS)
+    mainStatistic.depositCount = mainStatistic.depositCount + 1
+    mainStatistic.save()
 }
 
 export function handleWithdraw(event: WithdrawEvent): void {
@@ -73,4 +90,9 @@ export function handleWithdraw(event: WithdrawEvent): void {
     withdraw.amount = convertTokenToDecimal(event.params.amount, withdrawedToken.decimals)
     withdraw.lpTokenAmount = convertTokenToDecimal(event.params.lpTokenAmount, withdrawedToken.decimals)
     withdraw.save()
+
+    //update statistic
+    let mainStatistic = MainStatistic.load(FACTORY_ADDRESS)
+    mainStatistic.witdrawCount = mainStatistic.witdrawCount + 1
+    mainStatistic.save()
 }
