@@ -52,6 +52,7 @@ type DODOPair @entity {
 type Trade @entity {
     id: ID!
 
+    trader: User!
     dodoPair: DODOPair
     baseBuy: BigDecimal!
     baseSell: BigDecimal!
@@ -62,6 +63,7 @@ type Trade @entity {
 type Deposit @entity {
     id: ID!
 
+    depositer: User!
     dodoPair: DODOPair
     deposited: Token
     payer: Bytes
@@ -73,6 +75,7 @@ type Deposit @entity {
 type Withdraw @entity {
     id: ID!
 
+    withdrawer: User!
     dodoPair: DODOPair
     withdrawed: Token
     payer: Bytes
@@ -81,4 +84,10 @@ type Withdraw @entity {
     lpTokenAmount: BigDecimal!
 }
 
+type User @entity {
+    id: ID!
+    deposits: [Deposit!]! @derivedFrom(field: "depositer")
+    withdraws: [Withdraw!]! @derivedFrom(field: "withdrawer")
+    trades: [Trade!] @derivedFrom(field: "trader")
+}
    

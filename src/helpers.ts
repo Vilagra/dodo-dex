@@ -5,7 +5,7 @@ import {ERC20SymbolBytes} from '../generated/ZooFactory/ERC20SymbolBytes'
 import {ERC20NameBytes} from '../generated/ZooFactory/ERC20NameBytes'
 import {FACTORY_ADDRESS} from "./main";
 import {Token} from "../generated/schema";
-import {ZooFactory} from "../generated/templates/DODOPairTemplate/ZooFactory";
+import {ZooFactory} from "../generated/templates/DODOPairTemplate/ZooFactory"
 // import { User, Bundle, Token, LiquidityPosition, LiquidityPositionSnapshot, Pair } from '../types/schema'
 // import { Factory as FactoryContract } from '../types/templates/Pair/Factory'
 

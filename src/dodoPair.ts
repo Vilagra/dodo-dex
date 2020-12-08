@@ -4,13 +4,14 @@ import {
     Deposit as DepositEvent,
     Withdraw as WithdrawEvent
 } from "../generated/templates/DODOPairTemplate/DODOPair";
-import {DODOPair, Token, Trade, Deposit, Withdraw, MainStatistic} from "../generated/schema";
+import {log, BigInt, BigDecimal, Address} from '@graphprotocol/graph-ts'
+import {DODOPair, Token, Trade, Deposit, Withdraw, MainStatistic, User} from "../generated/schema";
 import {convertTokenToDecimal, ZERO_BIG_DECIMAL} from "./helpers";
 import {FACTORY_ADDRESS} from "./main";
-import {BigDecimal} from "@graphprotocol/graph-ts/index";
 
 export function handleBaseSell(event: SellBaseToken): void {
     let dodoPair = DODOPair.load(event.address.toHexString())
+    let user = loadOrCreateNewUser(event.params.seller)
     let baseToken = Token.load(dodoPair.baseToken)
     let quoteToken = Token.load(dodoPair.quoteToken)
     let baseSellAmount = convertTokenToDecimal(event.params.payBase, baseToken.decimals)
@@ -21,6 +22,7 @@ export function handleBaseSell(event: SellBaseToken): void {
     trade.baseBuy = ZERO_BIG_DECIMAL
     trade.quoteSell = ZERO_BIG_DECIMAL
     trade.quoteBuy = quoteBuyAmount
+    trade.trader = user.id
     trade.save()
 
     //update statistic
@@ -35,6 +37,7 @@ export function handleBaseBuy(event: BuyBaseToken): void {
     let dodoPair = DODOPair.load(event.address.toHexString())
     let baseToken = Token.load(dodoPair.baseToken)
     let quoteToken = Token.load(dodoPair.quoteToken)
+    let user = loadOrCreateNewUser(event.params.buyer)
     let quoteSellAmount = convertTokenToDecimal(event.params.payQuote, quoteToken.decimals)
     let baseBuyAmount = convertTokenToDecimal(event.params.receiveBase, baseToken.decimals)
     let trade = new Trade(event.transaction.hash.toHexString())
@@ -43,6 +46,7 @@ export function handleBaseBuy(event: BuyBaseToken): void {
     trade.baseBuy = baseBuyAmount
     trade.quoteSell = quoteSellAmount
     trade.quoteBuy = ZERO_BIG_DECIMAL
+    trade.trader = user.id
     trade.save()
 
     //update statistic
@@ -67,9 +71,8 @@ export function handleDeposit(event: DepositEvent): void {
     deposit.receiver = event.params.receiver
     deposit.amount = amount
     deposit.lpTokenAmount = convertTokenToDecimal(event.params.lpTokenAmount, depositedToken.decimals)
+    deposit.depositer = loadOrCreateNewUser(event.params.payer).id
     deposit.save()
-
-
 
     //update statistic
     let mainStatistic = MainStatistic.load(FACTORY_ADDRESS)
@@ -97,6 +100,7 @@ export function handleWithdraw(event: WithdrawEvent): void {
     withdraw.receiver = event.params.receiver
     withdraw.amount = amount
     withdraw.lpTokenAmount = convertTokenToDecimal(event.params.lpTokenAmount, withdrawedToken.decimals)
+    withdraw.withdrawer = loadOrCreateNewUser(event.params.payer).id
     withdraw.save()
 
     //update statistic
@@ -107,4 +111,13 @@ export function handleWithdraw(event: WithdrawEvent): void {
     withdrawedToken.totalWithdrawed = withdrawedToken.totalWithdrawed.plus(amount)
     withdrawedToken.amountInPoolsNow = withdrawedToken.amountInPoolsNow.minus(amount)
     withdrawedToken.save()
+}
+
+export function loadOrCreateNewUser(userAddress: Address) : User {
+    let user = User.load(userAddress.toHexString())
+    if(user === null){
+        user = new User(userAddress.toHexString())
+    }
+    user.save()
+    return user as User
 }
