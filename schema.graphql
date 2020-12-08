@@ -18,6 +18,26 @@ type Token @entity {
     symbol: String!
     name: String!
     decimals: BigInt!
+    # used for other stats like marketcap
+    totalSupply: BigInt!
+
+    # token specific volume
+    tradeVolume: BigDecimal!
+
+    # transactions across all pairs
+    txCount: BigInt!
+
+    # deposited across all pairs
+    totalDeposited: BigDecimal!
+
+    # deposited across all pairs
+    totalWithdrawed: BigDecimal!
+
+    amountInPoolsNow: BigDecimal!
+
+    # derived fields
+    pairBase: [DODOPair!]! @derivedFrom(field: "baseToken")
+    pairQuote: [DODOPair!]! @derivedFrom(field: "quoteToken")
 }
 
 type DODOPair @entity {

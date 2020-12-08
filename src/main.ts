@@ -34,27 +34,11 @@ export function handleDodoBirth(event: DODOBirth): void {
     if (baseToken === null) {
         baseToken = createTokenFromAddress(event.params.baseToken)
         mainStatistic.amountAwailableTokens = mainStatistic.amountAwailableTokens + 1
-        //baseToken.derivedETH = ZERO_BD
-        //baseToken.tradeVolume = ZERO_BD
-        //baseToken.tradeVolumeUSD = ZERO_BD
-        //baseToken.untrackedVolumeUSD = ZERO_BD
-        //baseToken.totalLiquidity = ZERO_BD
-        // baseToken.allPairs = []
-        //baseToken.txCount = ZERO_BI
     }
 
     if (quoteToken === null) {
         quoteToken = createTokenFromAddress(event.params.quoteToken)
         mainStatistic.amountAwailableTokens = mainStatistic.amountAwailableTokens + 1
-        //baseToken.totalSupply = fetchTokenTotalSupply(event.params.baseToken)
-        // bail if we couldn't figure out the decimals
-        //baseToken.derivedETH = ZERO_BD
-        //baseToken.tradeVolume = ZERO_BD
-        //baseToken.tradeVolumeUSD = ZERO_BD
-        //baseToken.untrackedVolumeUSD = ZERO_BD
-        //baseToken.totalLiquidity = ZERO_BD
-        // baseToken.allPairs = []
-        //baseToken.txCount = ZERO_BI
     }
     let dodoPair = new DODOPair(event.params.newBorn.toHexString()) as DODOPair
     dodoPair.baseToken = baseToken.id
