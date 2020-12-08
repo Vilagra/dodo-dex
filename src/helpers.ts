@@ -31,6 +31,12 @@ export function createTokenFromAddress(address: Address): Token {
         return token
     }
     token.decimals = decimals
+    token.totalSupply = fetchTokenTotalSupply(address)
+    token.tradeVolume = ZERO_BIG_DECIMAL
+    token.totalDeposited = ZERO_BIG_DECIMAL
+    token.totalWithdrawed = ZERO_BIG_DECIMAL
+    token.amountInPoolsNow = ZERO_BIG_DECIMAL
+    token.txCount = ZERO_BI
     return token
 }
 

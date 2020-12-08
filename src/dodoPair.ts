@@ -59,19 +59,26 @@ export function handleDeposit(event: DepositEvent): void {
     } else {
         depositedToken = Token.load(dodoPair.quoteToken) as Token
     }
+    let amount = convertTokenToDecimal(event.params.amount, depositedToken.decimals)
     let deposit = new Deposit(event.transaction.hash.toHexString())
     deposit.dodoPair = dodoPair.id
     deposit.deposited = depositedToken.id
     deposit.payer = event.params.payer
     deposit.receiver = event.params.receiver
-    deposit.amount = convertTokenToDecimal(event.params.amount, depositedToken.decimals)
+    deposit.amount = amount
     deposit.lpTokenAmount = convertTokenToDecimal(event.params.lpTokenAmount, depositedToken.decimals)
     deposit.save()
+
+
 
     //update statistic
     let mainStatistic = MainStatistic.load(FACTORY_ADDRESS)
     mainStatistic.depositCount = mainStatistic.depositCount + 1
     mainStatistic.save()
+
+    depositedToken.totalDeposited = depositedToken.totalDeposited.plus(amount)
+    depositedToken.amountInPoolsNow = depositedToken.amountInPoolsNow.plus(amount)
+    depositedToken.save()
 }
 
 export function handleWithdraw(event: WithdrawEvent): void {
@@ -82,12 +89,13 @@ export function handleWithdraw(event: WithdrawEvent): void {
     } else {
         withdrawedToken = Token.load(dodoPair.quoteToken) as Token
     }
+    let amount = convertTokenToDecimal(event.params.amount, withdrawedToken.decimals)
     let withdraw = new Withdraw(event.transaction.hash.toHexString())
     withdraw.dodoPair = dodoPair.id
     withdraw.withdrawed = withdrawedToken.id
     withdraw.payer = event.params.payer
     withdraw.receiver = event.params.receiver
-    withdraw.amount = convertTokenToDecimal(event.params.amount, withdrawedToken.decimals)
+    withdraw.amount = amount
     withdraw.lpTokenAmount = convertTokenToDecimal(event.params.lpTokenAmount, withdrawedToken.decimals)
     withdraw.save()
 
@@ -95,4 +103,8 @@ export function handleWithdraw(event: WithdrawEvent): void {
     let mainStatistic = MainStatistic.load(FACTORY_ADDRESS)
     mainStatistic.witdrawCount = mainStatistic.witdrawCount + 1
     mainStatistic.save()
+
+    withdrawedToken.totalWithdrawed = withdrawedToken.totalWithdrawed.plus(amount)
+    withdrawedToken.amountInPoolsNow = withdrawedToken.amountInPoolsNow.minus(amount)
+    withdrawedToken.save()
 }
