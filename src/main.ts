@@ -1,6 +1,6 @@
 import {DODOBirth} from '../generated/ZooFactory/Zoo'
 import {MainStatistic, Token, DODOPair} from '../generated/schema'
-import {log} from '@graphprotocol/graph-ts'
+import {log, Address} from '@graphprotocol/graph-ts'
 import {DODOPairTemplate} from "../generated/templates";
 import {
     ZERO_BIG_DECIMAL,
@@ -43,25 +43,12 @@ export function handleDodoBirth(event: DODOBirth): void {
     let dodoPair = new DODOPair(event.params.newBorn.toHexString()) as DODOPair
     dodoPair.baseToken = baseToken.id
     dodoPair.quoteToken = quoteToken.id
-    //pair.liquidityProviderCount = ZERO_BI
-    //pair.createdAtTimestamp = event.block.timestamp
-    //pair.createdAtBlockNumber = event.block.number
-    //pair.txCount = ZERO_BI
-    //pair.reserve0 = ZERO_BD
-    //pair.reserve1 = ZERO_BD
-    //pair.trackedReserveETH = ZERO_BD
-    //pair.reserveETH = ZERO_BD
-    //pair.reserveUSD = ZERO_BD
-    //pair.totalSupply = ZERO_BD
-    //pair.volumeToken0 = ZERO_BD
-    //pair.volumeToken1 = ZERO_BD
-    //pair.volumeUSD = ZERO_BD
-    //pair.untrackedVolumeUSD = ZERO_BD
-    //pair.token0Price = ZERO_BD
-    //pair.token1Price = ZERO_BD
-
-    // create the tracked contract based on the template
-    //PairTemplate.create(event.params.pair)
+    dodoPair.baseDepositedAmount = ZERO_BIG_DECIMAL
+    dodoPair.quoteDepositedAmount = ZERO_BIG_DECIMAL
+    dodoPair.currentReserveQuote = ZERO_BIG_DECIMAL
+    dodoPair.currentReseveBase = ZERO_BIG_DECIMAL
+    dodoPair.allTimeBaseTokenTradeVolume = ZERO_BIG_DECIMAL
+    dodoPair.allTimeQuoteTokenTradeVolume = ZERO_BIG_DECIMAL
 
     // save updated values
     DODOPairTemplate.create(event.params.newBorn)

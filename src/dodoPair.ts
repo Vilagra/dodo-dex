@@ -30,6 +30,10 @@ export function handleBaseSell(event: SellBaseToken): void {
     mainStatistic.tradeCount = mainStatistic.tradeCount + 1
     mainStatistic.save()
 
+    dodoPair.allTimeBaseTokenTradeVolume = dodoPair.allTimeBaseTokenTradeVolume.plus(baseSellAmount)
+    dodoPair.allTimeQuoteTokenTradeVolume = dodoPair.allTimeQuoteTokenTradeVolume.plus(quoteBuyAmount)
+    dodoPair.save()
+
 }
 
 
@@ -53,6 +57,10 @@ export function handleBaseBuy(event: BuyBaseToken): void {
     let mainStatistic = MainStatistic.load(FACTORY_ADDRESS)
     mainStatistic.tradeCount = mainStatistic.tradeCount + 1
     mainStatistic.save()
+
+    dodoPair.allTimeBaseTokenTradeVolume = dodoPair.allTimeBaseTokenTradeVolume.plus(baseBuyAmount)
+    dodoPair.allTimeQuoteTokenTradeVolume = dodoPair.allTimeQuoteTokenTradeVolume.plus(quoteSellAmount)
+    dodoPair.save()
 }
 
 export function handleDeposit(event: DepositEvent): void {
@@ -82,6 +90,17 @@ export function handleDeposit(event: DepositEvent): void {
     depositedToken.totalDeposited = depositedToken.totalDeposited.plus(amount)
     depositedToken.amountInPoolsNow = depositedToken.amountInPoolsNow.plus(amount)
     depositedToken.save()
+
+
+    if (event.params.isBaseToken) {
+        dodoPair.baseDepositedAmount = dodoPair.baseDepositedAmount.plus(amount)
+        dodoPair.currentReseveBase = dodoPair.currentReseveBase.plus(amount)
+    } else {
+        dodoPair.quoteDepositedAmount = dodoPair.quoteDepositedAmount.plus(amount)
+        dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.plus(amount)
+    }
+
+    dodoPair.save()
 }
 
 export function handleWithdraw(event: WithdrawEvent): void {
@@ -111,6 +130,13 @@ export function handleWithdraw(event: WithdrawEvent): void {
     withdrawedToken.totalWithdrawed = withdrawedToken.totalWithdrawed.plus(amount)
     withdrawedToken.amountInPoolsNow = withdrawedToken.amountInPoolsNow.minus(amount)
     withdrawedToken.save()
+
+    if (event.params.isBaseToken) {
+        dodoPair.currentReseveBase = dodoPair.currentReseveBase.minus(amount)
+    } else {
+        dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.minus(amount)
+    }
+    dodoPair.save()
 }
 
 export function loadOrCreateNewUser(userAddress: Address) : User {
