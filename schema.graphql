@@ -1,7 +1,8 @@
 type MainStatistic @entity {
     id: ID!
+    "Total pair number"
     pairCount: Int!
-    # trade stats
+    "Total trade number"
     tradeCount: Int!
     # deposit stats
     depositCount: Int!
@@ -111,5 +112,13 @@ type User @entity {
     deposits: [Deposit!]! @derivedFrom(field: "depositer")
     withdraws: [Withdraw!]! @derivedFrom(field: "withdrawer")
     trades: [Trade!] @derivedFrom(field: "trader")
+}
+
+type AddFeeToReserveEvent @entity{
+    id: ID!
+
+    dodoPair: DODOPair
+    token: Token
+    amount: BigDecimal!
 }
    
