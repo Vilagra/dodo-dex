@@ -1,4 +1,4 @@
-/* eslint-disable prefer-const */
+
 import {log, BigInt, BigDecimal, Address} from '@graphprotocol/graph-ts'
 import {ERC20} from '../generated/ZooFactory/ERC20'
 import {ERC20SymbolBytes} from '../generated/ZooFactory/ERC20SymbolBytes'
@@ -6,26 +6,17 @@ import {ERC20NameBytes} from '../generated/ZooFactory/ERC20NameBytes'
 import {FACTORY_ADDRESS} from "./main";
 import {Token} from "../generated/schema";
 import {ZooFactory} from "../generated/templates/DODOPairTemplate/ZooFactory"
-// import { User, Bundle, Token, LiquidityPosition, LiquidityPositionSnapshot, Pair } from '../types/schema'
-// import { Factory as FactoryContract } from '../types/templates/Pair/Factory'
-
-export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
-export let factoryContract = ZooFactory.bind(Address.fromString(FACTORY_ADDRESS))
 
 export let ZERO_BI = BigInt.fromI32(0)
 export let ONE_BI = BigInt.fromI32(1)
 export let ZERO_BIG_DECIMAL = BigDecimal.fromString('0')
-export let ONE_BD = BigDecimal.fromString('1')
-export let BI_18 = BigInt.fromI32(18)
 
 export function createTokenFromAddress(address: Address): Token {
 
     let token = new Token(address.toHexString())
     token.symbol = fetchTokenSymbol(address)
     token.name = fetchTokenName(address)
-    //baseToken.totalSupply = fetchTokenTotalSupply(event.params.baseToken)
     let decimals = fetchTokenDecimals(address)
-    // bail if we couldn't figure out the decimals
     if (decimals === null) {
         log.debug('mybug the decimal on token 0 was null', [])
         return token
@@ -36,7 +27,6 @@ export function createTokenFromAddress(address: Address): Token {
     token.totalDeposited = ZERO_BIG_DECIMAL
     token.totalWithdrawed = ZERO_BIG_DECIMAL
     token.amountInPoolsNow = ZERO_BIG_DECIMAL
-    token.txCount = ZERO_BI
     token.totalFeesAdded = ZERO_BIG_DECIMAL
     return token
 }
@@ -162,61 +152,5 @@ export function fetchTokenDecimals(tokenAddress: Address): BigInt {
     }
     return BigInt.fromI32(decimalValue as i32)
 }
-
-/*export function createLiquidityPosition(exchange: Address, user: Address): LiquidityPosition {
-  let id = exchange
-    .toHexString()
-    .concat('-')
-    .concat(user.toHexString())
-  let liquidityTokenBalance = LiquidityPosition.load(id)
-  if (liquidityTokenBalance === null) {
-    let pair = Pair.load(exchange.toHexString())
-    pair.liquidityProviderCount = pair.liquidityProviderCount.plus(ONE_BI)
-    liquidityTokenBalance = new LiquidityPosition(id)
-    liquidityTokenBalance.liquidityTokenBalance = ZERO_BD
-    liquidityTokenBalance.pair = exchange.toHexString()
-    liquidityTokenBalance.user = user.toHexString()
-    liquidityTokenBalance.save()
-    pair.save()
-  }
-  if (liquidityTokenBalance === null) log.error('LiquidityTokenBalance is null', [id])
-  return liquidityTokenBalance as LiquidityPosition
-}*/
-
-/*export function createUser(address: Address): void {
-  let user = User.load(address.toHexString())
-  if (user === null) {
-    user = new User(address.toHexString())
-    user.usdSwapped = ZERO_BD
-    user.save()
-  }
-}*/
-
-/*
-export function createLiquiditySnapshot(position: LiquidityPosition, event: EthereumEvent): void {
-  let timestamp = event.block.timestamp.toI32()
-  let bundle = Bundle.load('1')
-  let pair = Pair.load(position.pair)
-  let token0 = Token.load(pair.token0)
-  let token1 = Token.load(pair.token1)
-
-  // create new snapshot
-  let snapshot = new LiquidityPositionSnapshot(position.id.concat(timestamp.toString()))
-  snapshot.liquidityPosition = position.id
-  snapshot.timestamp = timestamp
-  snapshot.block = event.block.number.toI32()
-  snapshot.user = position.user
-  snapshot.pair = position.pair
-  snapshot.token0PriceUSD = token0.derivedETH.times(bundle.ethPrice)
-  snapshot.token1PriceUSD = token1.derivedETH.times(bundle.ethPrice)
-  snapshot.reserve0 = pair.reserve0
-  snapshot.reserve1 = pair.reserve1
-  snapshot.reserveUSD = pair.reserveUSD
-  snapshot.liquidityTokenTotalSupply = pair.totalSupply
-  snapshot.liquidityTokenBalance = position.liquidityTokenBalance
-  snapshot.liquidityPosition = position.id
-  snapshot.save()
-  position.save()
-}*/
 
 

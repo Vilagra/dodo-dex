@@ -3,10 +3,9 @@ import {
     BuyBaseToken,
     Deposit as DepositEvent,
     Withdraw as WithdrawEvent,
-    Donate,
-    DODOPair as DODOPairContract
+    Donate
 } from "../generated/templates/DODOPairTemplate/DODOPair";
-import {log, BigInt, BigDecimal, Address} from '@graphprotocol/graph-ts'
+import {Address, log} from '@graphprotocol/graph-ts'
 import {
     DODOPair,
     Token,
@@ -15,15 +14,13 @@ import {
     Withdraw,
     MainStatistic,
     User,
-    AddFeeToReserveEvent
+    Fee
 } from "../generated/schema";
 import {convertTokenToDecimal, ZERO_BIG_DECIMAL} from "./helpers";
 import {FACTORY_ADDRESS} from "./main";
 
 export function handleBaseSell(event: SellBaseToken): void {
     let dodoPair = DODOPair.load(event.address.toHexString())
-    let contract = DODOPairContract.bind(event.address)
-    let newTokenAmount = contract._TARGET_BASE_TOKEN_AMOUNT_()
     let user = loadOrCreateNewUser(event.params.seller)
     let baseToken = Token.load(dodoPair.baseToken)
     let quoteToken = Token.load(dodoPair.quoteToken)
@@ -31,28 +28,34 @@ export function handleBaseSell(event: SellBaseToken): void {
     let quoteBuyAmount = convertTokenToDecimal(event.params.receiveQuote, quoteToken.decimals)
     let trade = new Trade(event.transaction.hash.toHexString())
     trade.dodoPair = dodoPair.id
-    trade.baseSell = baseSellAmount
-    trade.baseBuy = ZERO_BIG_DECIMAL
-    trade.quoteSell = ZERO_BIG_DECIMAL
-    trade.quoteBuy = quoteBuyAmount
+    trade.tokenBuy = quoteToken.id
+    trade.tokenSell = baseToken.id
+    trade.amountBuy = quoteBuyAmount
+    trade.amountSell = baseSellAmount
     trade.trader = user.id
     trade.save()
+
 
     //update statistic
     let mainStatistic = MainStatistic.load(FACTORY_ADDRESS)
     mainStatistic.tradeCount = mainStatistic.tradeCount + 1
     mainStatistic.save()
 
+    baseToken.tradeVolume = baseToken.tradeVolume.plus(baseSellAmount)
+    quoteToken.tradeVolume = quoteToken.tradeVolume.plus(quoteBuyAmount)
+    baseToken.save()
+    quoteToken.save()
+
     dodoPair.allTimeBaseTokenTradeVolume = dodoPair.allTimeBaseTokenTradeVolume.plus(baseSellAmount)
     dodoPair.allTimeQuoteTokenTradeVolume = dodoPair.allTimeQuoteTokenTradeVolume.plus(quoteBuyAmount)
+    dodoPair.currentReseveBase = dodoPair.currentReseveBase.minus(baseSellAmount)
+    dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.plus(quoteBuyAmount)
     dodoPair.save()
 
 }
 
 
 export function handleBaseBuy(event: BuyBaseToken): void {
-    let contract = DODOPairContract.bind(event.address)
-    let newTokenAmount = contract._TARGET_BASE_TOKEN_AMOUNT_()
     let dodoPair = DODOPair.load(event.address.toHexString())
     let baseToken = Token.load(dodoPair.baseToken)
     let quoteToken = Token.load(dodoPair.quoteToken)
@@ -61,10 +64,10 @@ export function handleBaseBuy(event: BuyBaseToken): void {
     let baseBuyAmount = convertTokenToDecimal(event.params.receiveBase, baseToken.decimals)
     let trade = new Trade(event.transaction.hash.toHexString())
     trade.dodoPair = dodoPair.id
-    trade.baseSell = ZERO_BIG_DECIMAL
-    trade.baseBuy = baseBuyAmount
-    trade.quoteSell = quoteSellAmount
-    trade.quoteBuy = ZERO_BIG_DECIMAL
+    trade.tokenBuy = baseToken.id
+    trade.tokenSell = quoteToken.id
+    trade.amountBuy = baseBuyAmount
+    trade.amountSell = quoteSellAmount
     trade.trader = user.id
     trade.save()
 
@@ -73,8 +76,15 @@ export function handleBaseBuy(event: BuyBaseToken): void {
     mainStatistic.tradeCount = mainStatistic.tradeCount + 1
     mainStatistic.save()
 
+    baseToken.tradeVolume = baseToken.tradeVolume.plus(baseBuyAmount)
+    quoteToken.tradeVolume = quoteToken.tradeVolume.plus(quoteSellAmount)
+    baseToken.save()
+    quoteToken.save()
+
     dodoPair.allTimeBaseTokenTradeVolume = dodoPair.allTimeBaseTokenTradeVolume.plus(baseBuyAmount)
     dodoPair.allTimeQuoteTokenTradeVolume = dodoPair.allTimeQuoteTokenTradeVolume.plus(quoteSellAmount)
+    dodoPair.currentReseveBase = dodoPair.currentReseveBase.plus(baseBuyAmount)
+    dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.minus(quoteSellAmount)
     dodoPair.save()
 }
 
@@ -90,10 +100,8 @@ export function handleDeposit(event: DepositEvent): void {
     let deposit = new Deposit(event.transaction.hash.toHexString())
     deposit.dodoPair = dodoPair.id
     deposit.deposited = depositedToken.id
-    deposit.payer = event.params.payer
-    deposit.receiver = event.params.receiver
     deposit.amount = amount
-    deposit.lpTokenAmount = convertTokenToDecimal(event.params.lpTokenAmount, depositedToken.decimals)
+    deposit.lpTokenAmount = event.params.lpTokenAmount
     deposit.depositer = loadOrCreateNewUser(event.params.payer).id
     deposit.save()
 
@@ -130,10 +138,8 @@ export function handleWithdraw(event: WithdrawEvent): void {
     let withdraw = new Withdraw(event.transaction.hash.toHexString())
     withdraw.dodoPair = dodoPair.id
     withdraw.withdrawed = withdrawedToken.id
-    withdraw.payer = event.params.payer
-    withdraw.receiver = event.params.receiver
     withdraw.amount = amount
-    withdraw.lpTokenAmount = convertTokenToDecimal(event.params.lpTokenAmount, withdrawedToken.decimals)
+    withdraw.lpTokenAmount = event.params.lpTokenAmount
     withdraw.withdrawer = loadOrCreateNewUser(event.params.payer).id
     withdraw.save()
 
@@ -173,11 +179,11 @@ export function handleAddFeeToPool(event: Donate) : void {
     }
     let amount = convertTokenToDecimal(event.params.amount, addedFeeToken.decimals)
 
-    let addFeeEvent = new AddFeeToReserveEvent(event.transaction.hash.toHexString())
-    addFeeEvent.dodoPair = dodoPair.id
-    addFeeEvent.token = addedFeeToken.id
-    addFeeEvent.amount = amount
-    addFeeEvent.save()
+    let fee = new Fee(event.transaction.hash.toHexString())
+    fee.feeToPair = dodoPair.id
+    fee.token = addedFeeToken.id
+    fee.amount = amount
+    fee.save()
     //calculate stats
     addedFeeToken.totalFeesAdded = addedFeeToken.totalFeesAdded.plus(amount)
     addedFeeToken.save()
