@@ -33,6 +33,8 @@ type Token @entity {
     # deposited across all pairs
     totalWithdrawed: BigDecimal!
 
+    totalFeesAdded: BigDecimal!
+
     amountInPoolsNow: BigDecimal!
 
     # derived fields
@@ -60,6 +62,9 @@ type DODOPair @entity {
 
     allTimeBaseTokenTradeVolume: BigDecimal!
     allTimeQuoteTokenTradeVolume: BigDecimal!
+
+    feesInBaseToken: BigDecimal!
+    feesInQuoteToken: BigDecimal!
 
     deposits: [Deposit!]! @derivedFrom(field: "dodoPair")
     withdraws: [Withdraw!]! @derivedFrom(field: "dodoPair")

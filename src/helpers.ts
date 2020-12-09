@@ -37,6 +37,7 @@ export function createTokenFromAddress(address: Address): Token {
     token.totalWithdrawed = ZERO_BIG_DECIMAL
     token.amountInPoolsNow = ZERO_BIG_DECIMAL
     token.txCount = ZERO_BI
+    token.totalFeesAdded = ZERO_BIG_DECIMAL
     return token
 }
 

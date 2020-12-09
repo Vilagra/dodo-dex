@@ -59,6 +59,8 @@ templates:
           handler: handleDeposit
         - event: Withdraw(indexed address,indexed address,bool,uint256,uint256)
           handler: handleWithdraw
+        - event: Donate(uint256,bool)
+          handler: handleAddFeeToPool
 
 
 

@@ -2,7 +2,8 @@ import {
     SellBaseToken,
     BuyBaseToken,
     Deposit as DepositEvent,
-    Withdraw as WithdrawEvent
+    Withdraw as WithdrawEvent,
+    Donate
 } from "../generated/templates/DODOPairTemplate/DODOPair";
 import {log, BigInt, BigDecimal, Address} from '@graphprotocol/graph-ts'
 import {DODOPair, Token, Trade, Deposit, Withdraw, MainStatistic, User} from "../generated/schema";
@@ -139,11 +140,37 @@ export function handleWithdraw(event: WithdrawEvent): void {
     dodoPair.save()
 }
 
-export function loadOrCreateNewUser(userAddress: Address) : User {
+export function loadOrCreateNewUser(userAddress: Address): User {
     let user = User.load(userAddress.toHexString())
-    if(user === null){
+    if (user === null) {
         user = new User(userAddress.toHexString())
     }
     user.save()
     return user as User
+}
+
+export function handleAddFeeToPool(event: Donate) : void {
+    let dodoPair = DODOPair.load(event.address.toHexString())
+    let addedFeeToken: Token
+    if (event.params.isBaseToken) {
+        addedFeeToken = Token.load(dodoPair.baseToken) as Token
+    } else {
+        addedFeeToken = Token.load(dodoPair.quoteToken) as Token
+    }
+    let amount = convertTokenToDecimal(event.params.amount, addedFeeToken.decimals)
+
+    //calculate stats
+    addedFeeToken.totalFeesAdded = addedFeeToken.totalFeesAdded.plus(amount)
+    addedFeeToken.save()
+
+    if (event.params.isBaseToken) {
+        dodoPair.feesInBaseToken = dodoPair.feesInBaseToken.plus(amount)
+        dodoPair.currentReseveBase = dodoPair.currentReseveBase.plus(amount)
+    } else {
+        dodoPair.feesInQuoteToken = dodoPair.feesInQuoteToken.plus(amount)
+        dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.plus(amount)
+    }
+
+    dodoPair.save()
+
 }
