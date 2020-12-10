@@ -8,27 +8,27 @@ type MainStatistic @entity {
     depositCount: Int!
     "Total withdraw number"
     witdrawCount: Int!
-    "Amount tokens tradable on DODOExchange"
+    "Amount of tokens tradable on DODOExchange"
     amountAwailableTokens: Int!
 
 }
 
 type Token @entity {
-    "Token adress"
+    "Token address"
     id: ID!
-    "Token synbol"
+    "Token symbol"
     symbol: String!
     "Token name"
     name: String!
     "Token decimal"
     decimals: BigInt!
-    "Token total suply"
+    "Token total supply"
     totalSupply: BigInt!
-    "Sum volume by this token across all pairs"
+    "Sum of volume by this token across all pairs"
     tradeVolume: BigDecimal!
-    "Sum deposited by this token across all pairs"
+    "Sum of deposited by this token across all pairs"
     totalDeposited: BigDecimal!
-    "Sum withdrawed by this token across all pairs"
+    "Sum of withdrawn by this token across all pairs"
     totalWithdrawed: BigDecimal!
     "Total fees added by this token across all pairs"
     totalFeesAdded: BigDecimal!
@@ -41,6 +41,7 @@ type Token @entity {
 }
 
 type DODOPair @entity {
+    "Pair address"
     id: ID!
     "Base token in current pair"
     baseToken: Token!
@@ -50,17 +51,17 @@ type DODOPair @entity {
     baseDepositedAmount: BigDecimal!
     "Sum of all quote token deposits"
     quoteDepositedAmount: BigDecimal!
-    "Current base token lequidity"
+    "Current base token liquidity"
     currentReseveBase: BigDecimal!
-    "Current quote token lequidity"
+    "Current quote token liquidity"
     currentReserveQuote: BigDecimal!
-    "Sum all time base token trade volume"
+    "Sum of all time base token trade volume"
     allTimeBaseTokenTradeVolume: BigDecimal!
-    "Sum all time quote token trade volume"
+    "Sum of all time quote token trade volume"
     allTimeQuoteTokenTradeVolume: BigDecimal!
-    "Sum fees added to pool by base token"
+    "Sum of fees added to pool by base token"
     feesInBaseToken: BigDecimal!
-    "Sum fees added to pool by quote token"
+    "Sum of fees added to pool by quote token"
     feesInQuoteToken: BigDecimal!
     "All deposits in this Pair"
     deposits: [Deposit!]! @derivedFrom(field: "dodoPair")
@@ -68,59 +69,86 @@ type DODOPair @entity {
     withdraws: [Withdraw!]! @derivedFrom(field: "dodoPair")
     "All trades inside this Pair"
     allTrades: [Trade!] @derivedFrom(field: "dodoPair")
+    "All claims from this Pair"
+    claims: [Claim]! @derivedFrom(field: "claimFromPair")
+
 }
 
 type Trade @entity {
     id: ID!
+    "Pair where trade happens"
     dodoPair: DODOPair
+    "User who made trade"
     trader: User!
+    "Token which was bought in this trade"
     tokenBuy: Token
+    "Amount of tokens bought in current trade"
     amountBuy: BigDecimal!
     tokenSell: Token
+    "Amount of tokens sold in current trade"
     amountSell: BigDecimal!
 }
 
 type Deposit @entity {
     id: ID!
+    "User who makes deposit"
     depositer: User!
+    "Pair where deposit was added"
     dodoPair: DODOPair
+    "Token which was deposited"
     deposited: Token
+    "Amount of tokens deposited"
     amount: BigDecimal!
+    "Amount of tokens minted for this deposit"
     lpTokenAmount: BigInt!
 }
 
 type Withdraw @entity {
     id: ID!
-
-    withdrawer: User!
+    "User who makes withdraw"
+    user: User!
+    "Pair where withdraw happened"
     dodoPair: DODOPair
+    "Token which was withdrawn"
     withdrawed: Token
+    "Amount of tokens withdrawn"
     amount: BigDecimal!
+    "Amount of tokens burnt after this withdraw"
     lpTokenAmount: BigInt!
 }
 
 type User @entity {
+    "User address"
     id: ID!
+    "All deposits made by this user"
     deposits: [Deposit!]! @derivedFrom(field: "depositer")
-    withdraws: [Withdraw!]! @derivedFrom(field: "withdrawer")
+    "All withdraws made by this user"
+    withdraws: [Withdraw!]! @derivedFrom(field: "user")
+    "All trades made by this user"
     trades: [Trade!]! @derivedFrom(field: "trader")
+    "All claims made by this user"
     claims: [Claim]! @derivedFrom(field: "user")
 }
 
 type DonateFee @entity{
     id: ID!
-
+    "Pair where fee was added"
     feeToPair: DODOPair
+    "For this token fee was added"
     token: Token
+    "Amount of fee added"
     amount: BigDecimal!
 }
 
 type Claim @entity{
     id: ID!
-
+    "From which pair claim happens"
     claimFromPair: DODOPair
+    "User who made claim"
     user: User
+    "How much was claimed in base amount"
     baseAmount: BigDecimal!
+    "How much was claimed in quote amount"
     quoteAmount: BigDecimal!
 }
    
