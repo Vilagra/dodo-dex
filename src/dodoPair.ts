@@ -144,7 +144,7 @@ export function handleWithdraw(event: WithdrawEvent): void {
     withdraw.withdrawed = withdrawedToken.id
     withdraw.amount = amount
     withdraw.lpTokenAmount = event.params.lpTokenAmount
-    withdraw.withdrawer = loadOrCreateNewUser(event.params.payer).id
+    withdraw.user = loadOrCreateNewUser(event.params.payer).id
     withdraw.save()
 
     //update statistic

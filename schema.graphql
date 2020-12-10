@@ -84,6 +84,7 @@ type Trade @entity {
     tokenBuy: Token
     "Amount of tokens bought in current trade"
     amountBuy: BigDecimal!
+    "Token which was sold in this trade"
     tokenSell: Token
     "Amount of tokens sold in current trade"
     amountSell: BigDecimal!
