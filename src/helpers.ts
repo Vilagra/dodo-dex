@@ -3,9 +3,7 @@ import {log, BigInt, BigDecimal, Address} from '@graphprotocol/graph-ts'
 import {ERC20} from '../generated/ZooFactory/ERC20'
 import {ERC20SymbolBytes} from '../generated/ZooFactory/ERC20SymbolBytes'
 import {ERC20NameBytes} from '../generated/ZooFactory/ERC20NameBytes'
-import {FACTORY_ADDRESS} from "./main";
 import {Token} from "../generated/schema";
-import {ZooFactory} from "../generated/templates/DODOPairTemplate/ZooFactory"
 
 export let ZERO_BI = BigInt.fromI32(0)
 export let ONE_BI = BigInt.fromI32(1)
@@ -105,6 +103,10 @@ export function fetchTokenName(tokenAddress: Address): string {
     if (tokenAddress.toHexString() == '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
         return 'Aave Token'
     }
+    if (tokenAddress.toHexString() == '0xc226118fcd120634400ce228d61e1538fb21755f') {
+        return 'USD Coin'
+    }
+
 
     let contract = ERC20.bind(tokenAddress)
     let contractNameBytes = ERC20NameBytes.bind(tokenAddress)
