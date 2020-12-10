@@ -43,6 +43,8 @@ export function handleBaseSell(event: SellBaseToken): void {
 
     baseToken.tradeVolume = baseToken.tradeVolume.plus(baseSellAmount)
     quoteToken.tradeVolume = quoteToken.tradeVolume.plus(quoteBuyAmount)
+    baseToken.amountInPoolsNow = baseToken.amountInPoolsNow.plus(baseSellAmount)
+    quoteToken.amountInPoolsNow = quoteToken.amountInPoolsNow.minus(quoteBuyAmount)
     baseToken.save()
     quoteToken.save()
 
@@ -78,6 +80,8 @@ export function handleBaseBuy(event: BuyBaseToken): void {
 
     baseToken.tradeVolume = baseToken.tradeVolume.plus(baseBuyAmount)
     quoteToken.tradeVolume = quoteToken.tradeVolume.plus(quoteSellAmount)
+    baseToken.amountInPoolsNow = baseToken.amountInPoolsNow.minus(baseBuyAmount)
+    quoteToken.amountInPoolsNow = quoteToken.amountInPoolsNow.plus(quoteSellAmount)
     baseToken.save()
     quoteToken.save()
 
@@ -186,6 +190,7 @@ export function handleAddFeeToPool(event: Donate) : void {
     fee.save()
     //calculate stats
     addedFeeToken.totalFeesAdded = addedFeeToken.totalFeesAdded.plus(amount)
+    addedFeeToken.amountInPoolsNow = addedFeeToken.amountInPoolsNow.minus(amount)
     addedFeeToken.save()
 
     if (event.params.isBaseToken) {
@@ -217,6 +222,11 @@ export function handleClaim(event: ClaimAssets) : void {
     dodoPair.currentReseveBase = dodoPair.currentReseveBase.minus(amountClaimBase)
     dodoPair.feesInQuoteToken = dodoPair.feesInQuoteToken.minus(amountClaimQuote)
     dodoPair.save()
+
+    baseToken.amountInPoolsNow = baseToken.amountInPoolsNow.minus(amountClaimBase)
+    quoteToken.amountInPoolsNow = quoteToken.amountInPoolsNow.minus(amountClaimQuote)
+    baseToken.save()
+    quoteToken.save()
 }
 
 export function handleChargeMaintainerFee(event: ChargeMaintainerFee) : void {
@@ -233,5 +243,7 @@ export function handleChargeMaintainerFee(event: ChargeMaintainerFee) : void {
     } else {
         dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.minus(amount)
     }
+    addedFeeToken.amountInPoolsNow = addedFeeToken.amountInPoolsNow.minus(amount)
+    addedFeeToken.save()
     dodoPair.save()
 }

@@ -1,15 +1,7 @@
 import {DODOBirth} from '../generated/ZooFactory/Zoo'
 import {MainStatistic, Token, DODOPair} from '../generated/schema'
-import {log, Address} from '@graphprotocol/graph-ts'
 import {DODOPairTemplate} from "../generated/templates";
-import {
-    ZERO_BIG_DECIMAL,
-    ZERO_BI,
-    fetchTokenSymbol,
-    fetchTokenName,
-    fetchTokenDecimals,
-    fetchTokenTotalSupply, createTokenFromAddress
-} from './helpers'
+import {ZERO_BIG_DECIMAL, createTokenFromAddress} from './helpers'
 
 export const FACTORY_ADDRESS = '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'
 
