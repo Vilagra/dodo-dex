@@ -105,6 +105,10 @@ export function fetchTokenName(tokenAddress: Address): string {
     if (tokenAddress.toHexString() == '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
         return 'Aave Token'
     }
+    if (tokenAddress.toHexString() == '0xc226118fcd120634400ce228d61e1538fb21755f') {
+        return 'USD Coin'
+    }
+
 
     let contract = ERC20.bind(tokenAddress)
     let contractNameBytes = ERC20NameBytes.bind(tokenAddress)
