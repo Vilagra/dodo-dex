@@ -3,7 +3,7 @@ import {
     BuyBaseToken,
     Deposit as DepositEvent,
     Withdraw as WithdrawEvent,
-    Donate
+    Donate, ClaimAssets, ChargeMaintainerFee
 } from "../generated/templates/DODOPairTemplate/DODOPair";
 import {Address, log} from '@graphprotocol/graph-ts'
 import {
@@ -14,7 +14,7 @@ import {
     Withdraw,
     MainStatistic,
     User,
-    Fee
+    DonateFee, Claim
 } from "../generated/schema";
 import {convertTokenToDecimal, ZERO_BIG_DECIMAL} from "./helpers";
 import {FACTORY_ADDRESS} from "./main";
@@ -48,8 +48,8 @@ export function handleBaseSell(event: SellBaseToken): void {
 
     dodoPair.allTimeBaseTokenTradeVolume = dodoPair.allTimeBaseTokenTradeVolume.plus(baseSellAmount)
     dodoPair.allTimeQuoteTokenTradeVolume = dodoPair.allTimeQuoteTokenTradeVolume.plus(quoteBuyAmount)
-    dodoPair.currentReseveBase = dodoPair.currentReseveBase.minus(baseSellAmount)
-    dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.plus(quoteBuyAmount)
+    dodoPair.currentReseveBase = dodoPair.currentReseveBase.plus(baseSellAmount)
+    dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.minus(quoteBuyAmount)
     dodoPair.save()
 
 }
@@ -83,8 +83,8 @@ export function handleBaseBuy(event: BuyBaseToken): void {
 
     dodoPair.allTimeBaseTokenTradeVolume = dodoPair.allTimeBaseTokenTradeVolume.plus(baseBuyAmount)
     dodoPair.allTimeQuoteTokenTradeVolume = dodoPair.allTimeQuoteTokenTradeVolume.plus(quoteSellAmount)
-    dodoPair.currentReseveBase = dodoPair.currentReseveBase.plus(baseBuyAmount)
-    dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.minus(quoteSellAmount)
+    dodoPair.currentReseveBase = dodoPair.currentReseveBase.minus(baseBuyAmount)
+    dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.plus(quoteSellAmount)
     dodoPair.save()
 }
 
@@ -179,7 +179,7 @@ export function handleAddFeeToPool(event: Donate) : void {
     }
     let amount = convertTokenToDecimal(event.params.amount, addedFeeToken.decimals)
 
-    let fee = new Fee(event.transaction.hash.toHexString())
+    let fee = new DonateFee(event.transaction.hash.toHexString())
     fee.feeToPair = dodoPair.id
     fee.token = addedFeeToken.id
     fee.amount = amount
@@ -198,4 +198,40 @@ export function handleAddFeeToPool(event: Donate) : void {
 
     dodoPair.save()
 
+}
+
+export function handleClaim(event: ClaimAssets) : void {
+    let dodoPair = DODOPair.load(event.address.toHexString())
+    let baseToken = Token.load(dodoPair.baseToken) as Token
+    let quoteToken = Token.load(dodoPair.quoteToken) as Token
+    let amountClaimBase = convertTokenToDecimal(event.params.baseTokenAmount, baseToken.decimals)
+    let amountClaimQuote = convertTokenToDecimal(event.params.quoteTokenAmount, quoteToken.decimals)
+    let user = loadOrCreateNewUser(event.params.user).id
+    let claim = new Claim(event.transaction.hash.toHexString())
+    claim.baseAmount = amountClaimBase
+    claim.quoteAmount = amountClaimQuote
+    claim.claimFromPair = dodoPair.id
+    claim.user = user
+    claim.save()
+
+    dodoPair.currentReseveBase = dodoPair.currentReseveBase.minus(amountClaimBase)
+    dodoPair.feesInQuoteToken = dodoPair.feesInQuoteToken.minus(amountClaimQuote)
+    dodoPair.save()
+}
+
+export function handleChargeMaintainerFee(event: ChargeMaintainerFee) : void {
+    let dodoPair = DODOPair.load(event.address.toHexString())
+    let addedFeeToken: Token
+    if (event.params.isBaseToken) {
+        addedFeeToken = Token.load(dodoPair.baseToken) as Token
+    } else {
+        addedFeeToken = Token.load(dodoPair.quoteToken) as Token
+    }
+    let amount = convertTokenToDecimal(event.params.amount, addedFeeToken.decimals)
+    if (event.params.isBaseToken) {
+        dodoPair.currentReseveBase = dodoPair.currentReseveBase.minus(amount)
+    } else {
+        dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.minus(amount)
+    }
+    dodoPair.save()
 }

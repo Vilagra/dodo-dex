@@ -61,6 +61,10 @@ templates:
           handler: handleWithdraw
         - event: Donate(uint256,bool)
           handler: handleAddFeeToPool
+        - event: ClaimAssets(indexed address,uint256,uint256)
+          handler: handleClaim
+        - event: ChargeMaintainerFee(indexed address,bool,uint256)
+          handler: handleChargeMaintainerFee
 
 
 

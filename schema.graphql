@@ -103,14 +103,24 @@ type User @entity {
     id: ID!
     deposits: [Deposit!]! @derivedFrom(field: "depositer")
     withdraws: [Withdraw!]! @derivedFrom(field: "withdrawer")
-    trades: [Trade!] @derivedFrom(field: "trader")
+    trades: [Trade!]! @derivedFrom(field: "trader")
+    claims: [Claim]! @derivedFrom(field: "user")
 }
 
-type Fee @entity{
+type DonateFee @entity{
     id: ID!
 
     feeToPair: DODOPair
     token: Token
     amount: BigDecimal!
+}
+
+type Claim @entity{
+    id: ID!
+
+    claimFromPair: DODOPair
+    user: User
+    baseAmount: BigDecimal!
+    quoteAmount: BigDecimal!
 }
    
