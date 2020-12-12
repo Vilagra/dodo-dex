@@ -38,7 +38,7 @@ export function handleDodoBirth(event: DODOBirth): void {
     dodoPair.baseDepositedAmount = ZERO_BIG_DECIMAL
     dodoPair.quoteDepositedAmount = ZERO_BIG_DECIMAL
     dodoPair.currentReserveQuote = ZERO_BIG_DECIMAL
-    dodoPair.currentReseveBase = ZERO_BIG_DECIMAL
+    dodoPair.currentReserveBase = ZERO_BIG_DECIMAL
     dodoPair.allTimeBaseTokenTradeVolume = ZERO_BIG_DECIMAL
     dodoPair.allTimeQuoteTokenTradeVolume = ZERO_BIG_DECIMAL
     dodoPair.feesInBaseToken = ZERO_BIG_DECIMAL

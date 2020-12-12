@@ -31,4 +31,4 @@ helpers.ts - mainly used for extracting data about tokens (name, decimal, suply,
 1) Collecting the stats by days and hours.
 2) Learning how to receive the assets price and calculate the liquidity and amount in USD.
 3) I couldn't find the way how to dynamically extract information about lpToken from the contract, I have an idea to implement this statically using lp tokens addresses written in the documentation https://dodoex.github.io/docs/docs/deployedInfo/
-4) It seems that currentReserves are caltulating wrong for now, I made some improvements but apparently missed something
+4) It seems that currentReserves are calculating wrong for now, I made some improvements but apparently missed something(FIXED)

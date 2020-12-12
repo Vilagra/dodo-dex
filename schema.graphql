@@ -52,7 +52,7 @@ type DODOPair @entity {
     "Sum of all quote token deposits"
     quoteDepositedAmount: BigDecimal!
     "Current base token liquidity"
-    currentReseveBase: BigDecimal!
+    currentReserveBase: BigDecimal!
     "Current quote token liquidity"
     currentReserveQuote: BigDecimal!
     "Sum of all time base token trade volume"
