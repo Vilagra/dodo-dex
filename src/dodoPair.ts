@@ -5,9 +5,9 @@ import {
     Withdraw as WithdrawEvent,
     Donate,
     ClaimAssets,
-    ChargeMaintainerFee,
     DonateBaseTokenCall,
-    DonateQuoteTokenCall
+    DonateQuoteTokenCall,
+    ChargePenalty
 } from "../generated/templates/DODOPairTemplate/DODOPair";
 import {Address, log} from '@graphprotocol/graph-ts'
 import {
@@ -18,7 +18,7 @@ import {
     Withdraw,
     MainStatistic,
     User,
-    DonateFee, Claim
+    DonateFee, Claim, Penalty
 } from "../generated/schema";
 import {convertTokenToDecimal, ZERO_BIG_DECIMAL} from "./helpers";
 import {FACTORY_ADDRESS} from "./main";
@@ -230,22 +230,30 @@ export function handleClaim(event: ClaimAssets) : void {
     quoteToken.save()
 }
 
-export function handleChargeMaintainerFee(event: ChargeMaintainerFee) : void {
+export function handleChargePenaltyFee(event: ChargePenalty) : void {
     let dodoPair = DODOPair.load(event.address.toHexString())
-    let addedFeeToken: Token
+    let cahrgedPenaltyToken: Token
     if (event.params.isBaseToken) {
-        addedFeeToken = Token.load(dodoPair.baseToken) as Token
+        cahrgedPenaltyToken = Token.load(dodoPair.baseToken) as Token
     } else {
-        addedFeeToken = Token.load(dodoPair.quoteToken) as Token
+        cahrgedPenaltyToken = Token.load(dodoPair.quoteToken) as Token
     }
-    let amount = convertTokenToDecimal(event.params.amount, addedFeeToken.decimals)
+    let amount = convertTokenToDecimal(event.params.amount, cahrgedPenaltyToken.decimals)
+    let penalty = new Penalty(event.transaction.hash.toHexString())
+    penalty.pair = dodoPair.id
+    penalty.token = cahrgedPenaltyToken.id
+    penalty.amount = amount
+    penalty.save()
+
     if (event.params.isBaseToken) {
         dodoPair.currentReserveBase = dodoPair.currentReserveBase.minus(amount)
+        dodoPair.penaltiesBase = dodoPair.penaltiesBase.plus(amount)
     } else {
         dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.minus(amount)
+        dodoPair.penaltiesQuote = dodoPair.penaltiesQuote.plus(amount)
     }
-    addedFeeToken.amountInPoolsNow = addedFeeToken.amountInPoolsNow.minus(amount)
-    addedFeeToken.save()
+    cahrgedPenaltyToken.amountInPoolsNow = cahrgedPenaltyToken.amountInPoolsNow.minus(amount)
+    cahrgedPenaltyToken.save()
     dodoPair.save()
 }
 

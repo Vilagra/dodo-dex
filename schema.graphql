@@ -63,6 +63,10 @@ type DODOPair @entity {
     feesInBaseToken: BigDecimal!
     "Sum of fees added to pool by quote token"
     feesInQuoteToken: BigDecimal!
+    "Sum of charged penalties by base token"
+    penaltiesBase : BigDecimal!
+    "Sum of charged penalties by quote token"
+    penaltiesQuote: BigDecimal!
     "All deposits in this Pair"
     deposits: [Deposit!]! @derivedFrom(field: "dodoPair")
     "All withdraws from this Pair"
@@ -152,4 +156,13 @@ type Claim @entity{
     "How much was claimed in quote amount"
     quoteAmount: BigDecimal!
 }
-   
+
+type Penalty @entity{
+    id: ID!
+    "Pair where penalty was charged"
+    pair: DODOPair
+    "For this token penalty was charged"
+    token: Token
+    "Amount of penalty"
+    amount: BigDecimal!
+}

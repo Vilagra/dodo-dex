@@ -63,8 +63,8 @@ templates:
           handler: handleAddFeeToPool
         - event: ClaimAssets(indexed address,uint256,uint256)
           handler: handleClaim
-        - event: ChargeMaintainerFee(indexed address,bool,uint256)
-          handler: handleChargeMaintainerFee
+        - event: ChargePenalty(indexed address,bool,uint256)
+          handler: handleChargePenaltyFee
       callHandlers:
         - function: donateBaseToken(uint256)
           handler: handleDonateBaseToken
