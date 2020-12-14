@@ -177,7 +177,7 @@ export function loadOrCreateNewUser(userAddress: Address): User {
     return user as User
 }
 
-export function handleAddFeeToPool(event: Donate) : void {
+export function handleAddFeeToPool(event: Donate): void {
     let dodoPair = DODOPair.load(event.address.toHexString())
     let addedFeeToken: Token
     if (event.params.isBaseToken) {
@@ -206,7 +206,7 @@ export function handleAddFeeToPool(event: Donate) : void {
 
 }
 
-export function handleClaim(event: ClaimAssets) : void {
+export function handleClaim(event: ClaimAssets): void {
     let dodoPair = DODOPair.load(event.address.toHexString())
     let baseToken = Token.load(dodoPair.baseToken) as Token
     let quoteToken = Token.load(dodoPair.quoteToken) as Token
@@ -230,7 +230,7 @@ export function handleClaim(event: ClaimAssets) : void {
     quoteToken.save()
 }
 
-export function handleChargePenaltyFee(event: ChargePenalty) : void {
+export function handleChargePenaltyFee(event: ChargePenalty): void {
     let dodoPair = DODOPair.load(event.address.toHexString())
     let cahrgedPenaltyToken: Token
     if (event.params.isBaseToken) {
@@ -239,25 +239,27 @@ export function handleChargePenaltyFee(event: ChargePenalty) : void {
         cahrgedPenaltyToken = Token.load(dodoPair.quoteToken) as Token
     }
     let amount = convertTokenToDecimal(event.params.amount, cahrgedPenaltyToken.decimals)
-    let penalty = new Penalty(event.transaction.hash.toHexString())
-    penalty.pair = dodoPair.id
-    penalty.token = cahrgedPenaltyToken.id
-    penalty.amount = amount
-    penalty.save()
+    if (amount > ZERO_BIG_DECIMAL) {
+        let penalty = new Penalty(event.transaction.hash.toHexString())
+        penalty.pair = dodoPair.id
+        penalty.token = cahrgedPenaltyToken.id
+        penalty.amount = amount
+        penalty.save()
 
-    if (event.params.isBaseToken) {
-        dodoPair.currentReserveBase = dodoPair.currentReserveBase.minus(amount)
-        dodoPair.penaltiesBase = dodoPair.penaltiesBase.plus(amount)
-    } else {
-        dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.minus(amount)
-        dodoPair.penaltiesQuote = dodoPair.penaltiesQuote.plus(amount)
+        if (event.params.isBaseToken) {
+            dodoPair.currentReserveBase = dodoPair.currentReserveBase.plus(amount)
+            dodoPair.penaltiesBase = dodoPair.penaltiesBase.plus(amount)
+        } else {
+            dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.plus(amount)
+            dodoPair.penaltiesQuote = dodoPair.penaltiesQuote.plus(amount)
+        }
+        cahrgedPenaltyToken.amountInPoolsNow = cahrgedPenaltyToken.amountInPoolsNow.plus(amount)
+        cahrgedPenaltyToken.save()
+        dodoPair.save()
     }
-    cahrgedPenaltyToken.amountInPoolsNow = cahrgedPenaltyToken.amountInPoolsNow.minus(amount)
-    cahrgedPenaltyToken.save()
-    dodoPair.save()
 }
 
-export function handleDonateBaseToken(call: DonateBaseTokenCall) : void {
+export function handleDonateBaseToken(call: DonateBaseTokenCall): void {
     let dodoPair = DODOPair.load(call.to.toHexString())
     let token = Token.load(dodoPair.baseToken) as Token
     let amount = convertTokenToDecimal(call.inputs.amount, token.decimals)
@@ -267,7 +269,7 @@ export function handleDonateBaseToken(call: DonateBaseTokenCall) : void {
     dodoPair.save()
 }
 
-export function handleDonateQuoteToken(call: DonateQuoteTokenCall) : void {
+export function handleDonateQuoteToken(call: DonateQuoteTokenCall): void {
     let dodoPair = DODOPair.load(call.to.toHexString())
     let token = Token.load(dodoPair.quoteToken) as Token
     let amount = convertTokenToDecimal(call.inputs.amount, token.decimals)
