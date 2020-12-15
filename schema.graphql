@@ -125,6 +125,8 @@ type Withdraw @entity {
 type User @entity {
     "User address"
     id: ID!
+    "Amount of trades by this user, need to filter users by trade amount"
+    tradeCount: Int!
     "All deposits made by this user"
     deposits: [Deposit!]! @derivedFrom(field: "depositer")
     "All withdraws made by this user"

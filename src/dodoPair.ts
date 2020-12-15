@@ -7,7 +7,8 @@ import {
     ClaimAssets,
     DonateBaseTokenCall,
     DonateQuoteTokenCall,
-    ChargePenalty
+    ChargePenalty,
+    DODOPair as Contract, ChargeMaintainerFee
 } from "../generated/templates/DODOPairTemplate/DODOPair";
 import {Address, log} from '@graphprotocol/graph-ts'
 import {
@@ -58,6 +59,8 @@ export function handleBaseSell(event: SellBaseToken): void {
     dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.minus(quoteBuyAmount)
     dodoPair.save()
 
+    user.tradeCount = user.tradeCount + 1
+    user.save()
 }
 
 
@@ -94,6 +97,9 @@ export function handleBaseBuy(event: BuyBaseToken): void {
     dodoPair.currentReserveBase = dodoPair.currentReserveBase.minus(baseBuyAmount)
     dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.plus(quoteSellAmount)
     dodoPair.save()
+
+    user.tradeCount = user.tradeCount + 1
+    user.save()
 }
 
 export function handleDeposit(event: DepositEvent): void {
@@ -172,8 +178,9 @@ export function loadOrCreateNewUser(userAddress: Address): User {
     let user = User.load(userAddress.toHexString())
     if (user === null) {
         user = new User(userAddress.toHexString())
+        user.tradeCount = 0
+        user.save()
     }
-    user.save()
     return user as User
 }
 
