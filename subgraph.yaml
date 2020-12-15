@@ -65,6 +65,8 @@ templates:
           handler: handleClaim
         - event: ChargePenalty(indexed address,bool,uint256)
           handler: handleChargePenaltyFee
+        - event: ChargeMaintainerFee(indexed address,bool,uint256)
+          handler: handleMaintainerFee
       callHandlers:
         - function: donateBaseToken(uint256)
           handler: handleDonateBaseToken

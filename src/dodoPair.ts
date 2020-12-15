@@ -239,17 +239,17 @@ export function handleClaim(event: ClaimAssets): void {
 
 export function handleChargePenaltyFee(event: ChargePenalty): void {
     let dodoPair = DODOPair.load(event.address.toHexString())
-    let cahrgedPenaltyToken: Token
+    let chargedPenaltyToken: Token
     if (event.params.isBaseToken) {
-        cahrgedPenaltyToken = Token.load(dodoPair.baseToken) as Token
+        chargedPenaltyToken = Token.load(dodoPair.baseToken) as Token
     } else {
-        cahrgedPenaltyToken = Token.load(dodoPair.quoteToken) as Token
+        chargedPenaltyToken = Token.load(dodoPair.quoteToken) as Token
     }
-    let amount = convertTokenToDecimal(event.params.amount, cahrgedPenaltyToken.decimals)
+    let amount = convertTokenToDecimal(event.params.amount, chargedPenaltyToken.decimals)
     if (amount > ZERO_BIG_DECIMAL) {
         let penalty = new Penalty(event.transaction.hash.toHexString())
         penalty.pair = dodoPair.id
-        penalty.token = cahrgedPenaltyToken.id
+        penalty.token = chargedPenaltyToken.id
         penalty.amount = amount
         penalty.save()
 
@@ -260,8 +260,8 @@ export function handleChargePenaltyFee(event: ChargePenalty): void {
             dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.plus(amount)
             dodoPair.penaltiesQuote = dodoPair.penaltiesQuote.plus(amount)
         }
-        cahrgedPenaltyToken.amountInPoolsNow = cahrgedPenaltyToken.amountInPoolsNow.plus(amount)
-        cahrgedPenaltyToken.save()
+        chargedPenaltyToken.amountInPoolsNow = chargedPenaltyToken.amountInPoolsNow.plus(amount)
+        chargedPenaltyToken.save()
         dodoPair.save()
     }
 }
@@ -284,4 +284,26 @@ export function handleDonateQuoteToken(call: DonateQuoteTokenCall): void {
     token.save()
     dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.plus(amount)
     dodoPair.save()
+}
+
+
+export function handleMaintainerFee(event: ChargeMaintainerFee): void {
+    let dodoPair = DODOPair.load(event.address.toHexString())
+    let chargedToken: Token
+    if (event.params.isBaseToken) {
+        chargedToken = Token.load(dodoPair.baseToken) as Token
+    } else {
+        chargedToken = Token.load(dodoPair.quoteToken) as Token
+    }
+    let amount = convertTokenToDecimal(event.params.amount, chargedToken.decimals)
+    if (amount > ZERO_BIG_DECIMAL) {
+        if (event.params.isBaseToken) {
+            dodoPair.currentReserveBase = dodoPair.currentReserveBase.minus(amount)
+        } else {
+            dodoPair.currentReserveQuote = dodoPair.currentReserveQuote.minus(amount)
+        }
+        chargedToken.amountInPoolsNow = chargedToken.amountInPoolsNow.minus(amount)
+        chargedToken.save()
+        dodoPair.save()
+    }
 }
